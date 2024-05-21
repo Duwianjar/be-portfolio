@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Go Portfolio</title>
+    <link rel="icon" type="image/x-icon" href="https://go.dev/blog/go-brand/Go-Logo/SVG/Go-Logo_Blue.svg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  </head>
+  <body>
+    <!-- Navbar -->
+    <div id="navbarContainer"></div>
+    <!-- End of Navbar -->
+
+
+    <div class="container mt-3">
+      <div class="row d-flex justify-content-center">
+        <div class="col-11 col-xl-8 col-lg-9 col-md-10 ">
+          <h2>List Data About</h2>
+          {{ if ne .success "" }}
+              <p class="text-success">{{ .success }}</p>
+          {{ end }}
+          {{ if ne .error "" }}
+              <p class="text-danger">{{ .error }}</p>
+          {{ end }}
+          <hr>
+          <a href="/about/add" class="btn btn-primary mb-2">Add About</a>
+          <table class="table table-bordered mt-2 text-center">
+              <thead>
+                  <tr>
+                      <th>Name</th>
+                      <th>Value</th>
+                      <th>Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {{ range .abouts }}
+                  <tr>
+                      <td class="text-wrap" style="max-width: 200px; word-wrap: break-word;">{{ .Name }}</td>
+                      <td style="max-width: 500px !important;">{{ .Value }}</td>
+                      <td style="min-width: 200px !important;">
+                          <a href="/about/edit/{{ .Id }}" class="btn btn-warning text-light">Edit</a>
+                          <a href="/about/delete/{{ .Id }}" class="btn btn-danger text-light" onclick="return confirm('Are you sure you want to delete this profile ?')">Delete</a>
+                      </td>
+                  </tr>
+                  {{ end }}
+              </tbody>
+          </table>
+          <div class="row ">
+            <div class="col-6"> 
+              <button id="cvBtn" type="button" class="btn btn-primary">CV</button>
+              <button id="photoBtn" type="button" class="btn btn-secondary ms-2">Photo</button>
+            </div>
+            <div class="col-6">
+              <button id="btnChangeCV" type="button" class="btn btn-warning text-light float-end d-block" onclick="formChangeCV()">Change CV</button>
+              <button id="btnChangePhoto" type="button" class="btn btn-warning text-light float-end d-none" onclick="formChangePhoto()">Change Photo</button>
+            </div>
+          </div>
+          <hr>
+          <div class="row mt-3 d-none" id="uploadForm">
+            <div class="col-12">
+              <form action="/profile/updateCV" method="POST" enctype="multipart/form-data" class="d-flex flex-column">
+                <label for="pdfFile" class="form-label mb-2">Upload PDF:</label>
+                <div class="d-flex flex-row align-items-center mb-3">
+                  <div class="flex-grow-1 mr-2">
+                    <input type="file" class="form-control" id="pdfFile" name="pdfFile" accept="application/pdf" onchange="previewPDF()" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary ms-2 ">Upload</button>
+                </div>                
+              </form>      
+            </div>
+          </div>
+          <div class="row mt-3 d-none" id="uploadPhoto">
+            <div class="col-12">
+              <form action="/profile/updatePP" method="POST" enctype="multipart/form-data" class="d-flex flex-column">
+                <label for="photoFile" class="form-label mb-2">Upload Photo:</label>
+                <div class="d-flex flex-row align-items-center mb-3">
+                  <div class="flex-grow-1 mr-2">
+                    <input type="file" class="form-control" id="photoFile" name="photoFile" accept="image/jpeg, image/jpg, image/png" onchange="previewPhoto()" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary ms-2 ">Upload</button>
+                </div>                
+              </form>      
+            </div>
+          </div>
+          <embed id="pdfPreview" class="d-block" src="/file/{{ .cvAddress }}" width="100%" height="600" type="application/pdf" />
+          <div id="imgPreview" class="d-none text-center w-100">
+            <img id="photoPreview" src="/photo/{{ .ppAddress }}" alt="/photo/{{ .ppAddress }}" class="img-fluid">
+          </div>
+          <div class="mb-5"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const navbarContainer = document.getElementById('navbarContainer');
+        fetch('../navbar')
+          .then(response => response.text())
+          .then(data => {
+            navbarContainer.innerHTML = data;
+          })
+          .catch(error => {
+            console.error('Error loading navbar:', error);
+          });
+      });
+    </script>
+    <script>
+      function formChangeCV() {
+        var uploadForm = document.getElementById("uploadForm");
+        uploadForm.classList.remove("d-none");
+      }
+      function formChangePhoto() {
+        var uploadPhoto = document.getElementById("uploadPhoto");
+        uploadPhoto.classList.remove("d-none");
+      }
+    </script>
+    <script>
+      function previewPDF() {
+        var fileInput = document.getElementById('pdfFile');
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        
+        reader.onload = function(event) {
+            var pdfPreview = document.getElementById('pdfPreview');
+            pdfPreview.setAttribute('src', event.target.result);
+        };
+        
+        reader.readAsDataURL(file);
+      }    
+      function previewPhoto() {
+        var fileInput = document.getElementById('photoFile');
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        
+        reader.onload = function(event) {
+            var photoPreview = document.getElementById('photoPreview');
+            photoPreview.setAttribute('src', event.target.result);
+        };
+        
+        reader.readAsDataURL(file);
+      }    
+    </script>
+    <script>
+      // Mendapatkan elemen tombol CV dan Photo
+      const cvBtn = document.getElementById('cvBtn');
+      const photoBtn = document.getElementById('photoBtn');
+      const btnChangeCV = document.getElementById('btnChangeCV');
+      const btnChangePhoto = document.getElementById('btnChangePhoto');
+
+      const pdfPreview = document.getElementById('pdfPreview');
+      const imgPreview = document.getElementById('imgPreview');
+  
+      // Menambahkan event listener untuk mengubah kelas saat tombol Photo diklik
+      photoBtn.addEventListener('click', function() {
+        photoBtn.classList.remove('btn-secondary');
+        photoBtn.classList.add('btn-primary');
+  
+        cvBtn.classList.remove('btn-primary');
+        cvBtn.classList.add('btn-secondary');
+
+        btnChangeCV.classList.remove('d-block');
+        btnChangeCV.classList.add('d-none');
+
+        btnChangePhoto.classList.remove('d-none');
+        btnChangePhoto.classList.add('d-block');
+
+        pdfPreview.classList.remove('d-block');
+        pdfPreview.classList.add('d-none');
+
+        imgPreview.classList.remove('d-none');
+        imgPreview.classList.add('d-block');
+      });
+  
+      // Menambahkan event listener untuk mengubah kelas saat tombol CV diklik
+      cvBtn.addEventListener('click', function() {
+        cvBtn.classList.remove('btn-secondary');
+        cvBtn.classList.add('btn-primary');
+  
+        photoBtn.classList.remove('btn-primary');
+        photoBtn.classList.add('btn-secondary');
+        
+        btnChangePhoto.classList.remove('d-block');
+        btnChangePhoto.classList.add('d-none');
+
+        btnChangeCV.classList.remove('d-none');
+        btnChangeCV.classList.add('d-block');
+        
+        imgPreview.classList.remove('d-block');
+        imgPreview.classList.add('d-none');
+
+        pdfPreview.classList.remove('d-none');
+        pdfPreview.classList.add('d-block');
+      });
+    </script>
+  </body>
+</html>
