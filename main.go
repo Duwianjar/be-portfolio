@@ -1,6 +1,7 @@
 package main
 
 import (
+	apiAbout "be-portfolio/api/apiAbout"
 	apiProfile "be-portfolio/api/apiProfile"
 	"be-portfolio/config"
 	aboutcontroller "be-portfolio/controller/aboutController"
@@ -42,11 +43,11 @@ func main() {
 	http.HandleFunc("/about/add", aboutcontroller.Add)
 	router.HandleFunc("/about/edit/{id}", aboutcontroller.Edit)
 	router.HandleFunc("/about/delete/{id}", aboutcontroller.Delete)
+	http.HandleFunc("/profile/updatePhotoAbout", aboutcontroller.UpdatePhoto)
 
 	// API
 	http.HandleFunc("/api/profile/all", apiProfile.All)
-
-
+	http.HandleFunc("/api/about/all", apiAbout.All)
 
 	// START RUNNING SERVER
 	port := 8080

@@ -3,6 +3,7 @@ package pboutModal
 import (
 	"be-portfolio/config"
 	"be-portfolio/entities"
+	"time"
 )
 
 func GetAll() []entities.About {
@@ -92,4 +93,22 @@ func FOTO() entities.File {
 	}
 
 	return file
+}
+
+func UpdatePhoto(address string) bool {
+	var name = "photoabout";
+	query, err := config.DB.Exec(`
+		UPDATE files SET address = ?, updated_at = ? WHERE name = ?`,
+		address, time.Now(), name,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	result, err := query.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+
+	return result > 0
 }

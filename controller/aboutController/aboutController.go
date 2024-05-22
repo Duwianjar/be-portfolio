@@ -3,8 +3,12 @@ package profilecontroller
 import (
 	"be-portfolio/entities"
 	aboutmodel "be-portfolio/models/aboutModel"
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -165,6 +169,84 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	var store = sessions.NewCookieStore([]byte("secret"))
 	session, _ := store.Get(r, "session-name")
 	session.Values["success"] = "Successfully Deleted "+about.Name
+	session.Save(r, w)
+
+	http.Redirect(w, r, "/about", http.StatusSeeOther)
+
+}
+
+
+func UpdatePhoto(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		var store = sessions.NewCookieStore([]byte("secret"))
+		session, _ := store.Get(r, "session-name")
+		session.Values["error"] = "Method not allowed"
+		session.Save(r, w)
+
+		http.Redirect(w, r, "/about", http.StatusSeeOther)
+	}
+	
+	file, handler, err := r.FormFile("photoFile")
+	if err != nil {
+		var store = sessions.NewCookieStore([]byte("secret"))
+		session, _ := store.Get(r, "session-name")
+		session.Values["error"] = "Failed to retrieve file"
+		session.Save(r, w)
+
+		http.Redirect(w, r, "/about", http.StatusSeeOther)
+	}
+	defer file.Close()
+
+	extension := filepath.Ext(handler.Filename)
+	filename := fmt.Sprintf("photoabout_%s"+extension, time.Now().Format("20060102150405"))
+
+	savePath := filepath.Join("assets/img/", filename)
+
+	dst, err := os.Create(savePath)
+	if err != nil {
+		var store = sessions.NewCookieStore([]byte("secret"))
+		session, _ := store.Get(r, "session-name")
+		session.Values["error"] = "Failed to create file : "+handler.Filename
+		session.Save(r, w)
+
+		http.Redirect(w, r, "/about", http.StatusSeeOther)
+	}
+	
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		http.Error(w, "Failed to save file", http.StatusInternalServerError)
+		return
+	}
+
+	photo := aboutmodel.FOTO()
+
+	if ok := aboutmodel.UpdatePhoto(filename); !ok {
+		var store = sessions.NewCookieStore([]byte("secret"))
+		session, _ := store.Get(r, "session-name")
+		session.Values["error"] = "Failed to update database CV "
+		session.Save(r, w)
+
+		http.Redirect(w, r, "/about", http.StatusSeeOther)
+	}
+	
+    if _, err := os.Stat("assets/img/" + photo.Address); err == nil {
+        err := os.Remove("assets/img/" + photo.Address)
+        if err != nil {
+			var store = sessions.NewCookieStore([]byte("secret"))
+			session, _ := store.Get(r, "session-name")
+			session.Values["error"] = "Failed to delete existing file CV "
+			session.Save(r, w)
+
+			http.Redirect(w, r, "/about", http.StatusSeeOther)
+        }
+    }
+	
+	var store = sessions.NewCookieStore([]byte("secret"))
+	session, _ := store.Get(r, "session-name")
+	session.Values["success"] = "Successfully to update Photo About "
 	session.Save(r, w)
 
 	http.Redirect(w, r, "/about", http.StatusSeeOther)

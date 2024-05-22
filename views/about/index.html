@@ -48,31 +48,16 @@
           </table>
           <div class="row ">
             <div class="col-6"> 
-              <button id="cvBtn" type="button" class="btn btn-primary">CV</button>
-              <button id="photoBtn" type="button" class="btn btn-secondary ms-2">Photo</button>
+              <button id="photoBtn" type="button" class="btn btn-primary ms-2">Photo</button>
             </div>
             <div class="col-6">
-              <button id="btnChangeCV" type="button" class="btn btn-warning text-light float-end d-block" onclick="formChangeCV()">Change CV</button>
-              <button id="btnChangePhoto" type="button" class="btn btn-warning text-light float-end d-none" onclick="formChangePhoto()">Change Photo</button>
+              <button id="btnChangePhoto" type="button" class="btn btn-warning text-light float-end" onclick="formChangePhoto()">Change Photo</button>
             </div>
           </div>
           <hr>
-          <div class="row mt-3 d-none" id="uploadForm">
-            <div class="col-12">
-              <form action="/profile/updateCV" method="POST" enctype="multipart/form-data" class="d-flex flex-column">
-                <label for="pdfFile" class="form-label mb-2">Upload PDF:</label>
-                <div class="d-flex flex-row align-items-center mb-3">
-                  <div class="flex-grow-1 mr-2">
-                    <input type="file" class="form-control" id="pdfFile" name="pdfFile" accept="application/pdf" onchange="previewPDF()" required>
-                  </div>
-                  <button type="submit" class="btn btn-primary ms-2 ">Upload</button>
-                </div>                
-              </form>      
-            </div>
-          </div>
           <div class="row mt-3 d-none" id="uploadPhoto">
             <div class="col-12">
-              <form action="/profile/updatePP" method="POST" enctype="multipart/form-data" class="d-flex flex-column">
+              <form action="/profile/updatePhotoAbout" method="POST" enctype="multipart/form-data" class="d-flex flex-column">
                 <label for="photoFile" class="form-label mb-2">Upload Photo:</label>
                 <div class="d-flex flex-row align-items-center mb-3">
                   <div class="flex-grow-1 mr-2">
@@ -83,9 +68,8 @@
               </form>      
             </div>
           </div>
-          <embed id="pdfPreview" class="d-block" src="/file/{{ .cvAddress }}" width="100%" height="600" type="application/pdf" />
-          <div id="imgPreview" class="d-none text-center w-100">
-            <img id="photoPreview" src="/photo/{{ .ppAddress }}" alt="/photo/{{ .ppAddress }}" class="img-fluid">
+          <div id="imgPreview" class=" text-center w-100">
+            <img id="photoPreview" src="/photo/{{ .photoAddress }}" alt="/photo/{{ .photoAddress }}" class="img-fluid">
           </div>
           <div class="mb-5"></div>
         </div>
@@ -107,28 +91,12 @@
       });
     </script>
     <script>
-      function formChangeCV() {
-        var uploadForm = document.getElementById("uploadForm");
-        uploadForm.classList.remove("d-none");
-      }
       function formChangePhoto() {
         var uploadPhoto = document.getElementById("uploadPhoto");
         uploadPhoto.classList.remove("d-none");
       }
     </script>
     <script>
-      function previewPDF() {
-        var fileInput = document.getElementById('pdfFile');
-        var file = fileInput.files[0];
-        var reader = new FileReader();
-        
-        reader.onload = function(event) {
-            var pdfPreview = document.getElementById('pdfPreview');
-            pdfPreview.setAttribute('src', event.target.result);
-        };
-        
-        reader.readAsDataURL(file);
-      }    
       function previewPhoto() {
         var fileInput = document.getElementById('photoFile');
         var file = fileInput.files[0];
@@ -141,58 +109,6 @@
         
         reader.readAsDataURL(file);
       }    
-    </script>
-    <script>
-      // Mendapatkan elemen tombol CV dan Photo
-      const cvBtn = document.getElementById('cvBtn');
-      const photoBtn = document.getElementById('photoBtn');
-      const btnChangeCV = document.getElementById('btnChangeCV');
-      const btnChangePhoto = document.getElementById('btnChangePhoto');
-
-      const pdfPreview = document.getElementById('pdfPreview');
-      const imgPreview = document.getElementById('imgPreview');
-  
-      // Menambahkan event listener untuk mengubah kelas saat tombol Photo diklik
-      photoBtn.addEventListener('click', function() {
-        photoBtn.classList.remove('btn-secondary');
-        photoBtn.classList.add('btn-primary');
-  
-        cvBtn.classList.remove('btn-primary');
-        cvBtn.classList.add('btn-secondary');
-
-        btnChangeCV.classList.remove('d-block');
-        btnChangeCV.classList.add('d-none');
-
-        btnChangePhoto.classList.remove('d-none');
-        btnChangePhoto.classList.add('d-block');
-
-        pdfPreview.classList.remove('d-block');
-        pdfPreview.classList.add('d-none');
-
-        imgPreview.classList.remove('d-none');
-        imgPreview.classList.add('d-block');
-      });
-  
-      // Menambahkan event listener untuk mengubah kelas saat tombol CV diklik
-      cvBtn.addEventListener('click', function() {
-        cvBtn.classList.remove('btn-secondary');
-        cvBtn.classList.add('btn-primary');
-  
-        photoBtn.classList.remove('btn-primary');
-        photoBtn.classList.add('btn-secondary');
-        
-        btnChangePhoto.classList.remove('d-block');
-        btnChangePhoto.classList.add('d-none');
-
-        btnChangeCV.classList.remove('d-none');
-        btnChangeCV.classList.add('d-block');
-        
-        imgPreview.classList.remove('d-block');
-        imgPreview.classList.add('d-none');
-
-        pdfPreview.classList.remove('d-none');
-        pdfPreview.classList.add('d-block');
-      });
     </script>
   </body>
 </html>
