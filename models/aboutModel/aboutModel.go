@@ -1,4 +1,4 @@
-package pboutModal
+package aboutModal
 
 import (
 	"be-portfolio/config"

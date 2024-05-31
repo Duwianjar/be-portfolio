@@ -3,10 +3,12 @@ package main
 import (
 	apiAbout "be-portfolio/api/apiAbout"
 	apiProfile "be-portfolio/api/apiProfile"
+	apiSkill "be-portfolio/api/apiSkill"
 	"be-portfolio/config"
 	aboutcontroller "be-portfolio/controller/aboutController"
 	homecontroller "be-portfolio/controller/homeController"
 	profilecontroller "be-portfolio/controller/profileController"
+	skillcontroller "be-portfolio/controller/skillController"
 	"fmt"
 	"log"
 	"net/http"
@@ -44,10 +46,17 @@ func main() {
 	router.HandleFunc("/about/edit/{id}", aboutcontroller.Edit)
 	router.HandleFunc("/about/delete/{id}", aboutcontroller.Delete)
 	http.HandleFunc("/profile/updatePhotoAbout", aboutcontroller.UpdatePhoto)
+	
+	// 3. Skills 
+	http.HandleFunc("/skill", skillcontroller.Index)
+	http.HandleFunc("/skill/add", skillcontroller.Add)
+	router.HandleFunc("/skill/edit/{id}", skillcontroller.Edit)
+	router.HandleFunc("/skill/delete/{id}", skillcontroller.Delete)
 
 	// API
 	http.HandleFunc("/api/profile/all", apiProfile.All)
 	http.HandleFunc("/api/about/all", apiAbout.All)
+	http.HandleFunc("/api/skill/all", apiSkill.All)
 
 	// START RUNNING SERVER
 	port := 8080
